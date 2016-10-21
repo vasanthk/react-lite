@@ -1,2 +1,3 @@
-# react-prototype
-A bare bones working prototype of React :)
+# React Prototype
+
+Bare bones working prototype of React :)
