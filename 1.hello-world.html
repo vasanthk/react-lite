@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+</head>
+
+<body>
+
+<div id="container"></div>
+
+<!--
+    <script type="text/javascript">
+        React.render('hello world', document.getElementById("container"));
+    </script>
+
+    Corresponding HTML
+    <div id="container"></div>
+
+    HTML after React generation as follows:
+    <div id = "container">
+        <span data-reactid="0">hello world</span>
+    </div>
+-->
+
+<script type="text/javascript">
+    // Component class used to represent text render/update/delete
+    function ReactDOMTextComponent(text) {
+        // Saves text passed through
+        this._currentElement = '' + text;
+        // Root NodeID is used to identify the current DOMTextComponent
+        this._rootNodeID = null;
+    }
+
+    // Handles Mount - Here's where the component render generates it's corresponding DOM structure.
+    ReactDOMTextComponent.prototype.mountComponent = function (rootID) {
+        this._rootNodeID = rootID;
+        return '<span data-reactid="' + rootID + '">' + this._currentElement + '</span>';
+    };
+
+    // Component factory to return a new component instance
+    function instantiateReactComponent(node) {
+        if (typeof node === 'string' || typeof node === 'number') {
+            return new ReactDOMTextComponent(node)
+        }
+    }
+
+    React = {
+        nextReactRootIndex: 0,
+        render: function (element, container) {
+
+            var componentInstance = instantiateReactComponent(element);
+            var markup = componentInstance.mountComponent(React.nextReactRootIndex++);
+            $(container).html(markup);
+            // Trigger mount complete event - Does nothing as of now.
+            $(document).trigger('mountReady');
+        }
+    };
+
+    React.render('hello world', document.getElementById("container"))
+
+</script>
+
+</body>
+
+</html>
