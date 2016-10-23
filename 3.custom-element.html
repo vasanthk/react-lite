@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+</head>
+
+<body>
+
+<div id="container"></div>
+
+<script type="text/javascript">
+
+    /**                          */
+    /** REACT DOM TEXT COMPONENT */
+    /**                          */
+
+    // Component class used to represent text render/update/delete
+    function ReactDOMTextComponent(text) {
+        // Saves text passed through
+        this._currentElement = '' + text;
+        // Root NodeID is used to identify the current DOMTextComponent
+        this._rootNodeID = null;
+    }
+
+    // Handles Mount - Here's where the component render generates it's corresponding DOM structure.
+    ReactDOMTextComponent.prototype.mountComponent = function (rootID) {
+        this._rootNodeID = rootID;
+        return '<span data-reactid="' + rootID + '">' + this._currentElement + '</span>';
+    };
+
+    /**                     */
+    /** REACT DOM COMPONENT */
+    /**                     */
+
+    // Component class used to represent HTML tag DOM elements' render/update/delete
+    function ReactDOMComponent(element) {
+        // Save the current element object's reference
+        this._currentElement = element;
+        this._rootNodeID = null;
+    }
+
+    // Mounting the component to generate the DOM element structure.
+    ReactDOMComponent.prototype.mountComponent = function (rootID) {
+        // Copy root id to the instance.
+        this._rootNodeID = rootID;
+        var props = this._currentElement.props;
+        var tagOpen = '<' + this._currentElement.type;
+        var tagClose = '</' + this._currentElement.type + '>';
+
+        // Add react-id identification to the node as a data attribute.
+        // The data-reactid attribute is a custom attribute used so that React can uniquely identify its components within the DOM.
+        // This is important because React applications can be rendered at the server as well as the client.
+        //
+        // More: http://stackoverflow.com/a/33967810/1672655
+        // React 15 uses document.createElement instead, so client rendered markup won't include these attributes anymore.
+        tagOpen += ' data-reactid=' + this._rootNodeID;
+
+        // Put together prop values into the tag
+        for (var propKey in props) {
+            // Handle EventListeners passed in props - identified via regex.
+            if (/^on[A-Za-z]/.test(propKey)) {
+                var eventType = propKey.replace('on', '');
+                // Add the event listener as a custom event on the current DOM node - identfied via the rootNodeId values.
+                $(document).delegate('[data-reactid="' + this._rootNodeID + '"]', eventType + '.' + this._rootNodeID, props[propKey]);
+            }
+
+            // Ignore children and event listener props. -- Rest of the props are assigned as attributes to the DOM element.
+            if (props[propKey] && propKey !== 'children' && !/^on[A-Za-z]/.test(propKey)) {
+                tagOpen += ' ' + propKey + '=' + props[propKey];
+            }
+        }
+
+        // Recursively get the child nodes' render() content as well.
+        var content = '';
+        var children = props.children || [];
+
+        // Book-keeping: Save component instances of all children.
+        var childrenInstances = [];
+        var that = this;
+        $.each(children, function (key, child) {
+            var childComponentInstance = instantiateReactComponent(child);
+            childComponentInstance._mountIndex = key;
+
+            childrenInstances.push(childComponentInstance);
+            // Root id of children is calculated by concatenating it with the rootId of the parent.
+            var curRootId = that._rootNodeID + '.' + key;
+            //
+            var childMarkup = childComponentInstance.mountComponent(curRootId);
+            // Concatenate together the markup obtained
+            content += ' ' + childMarkup;
+        });
+
+        // The children instances are saved to the current DOM component instance
+        this._renderedChildren = childrenInstances;
+
+        // Return the final markup of the DOM component
+        return tagOpen + '>' + content + tagClose;
+    };
+
+    /**                           */
+    /** REACT COMPOSITE COMPONENT */
+    /**                           */
+
+    function ReactCompositeComponent(element) {
+        // Save the current element object's reference.
+        this._currentElement = element;
+        // To store the node reference.
+        this._rootNodeID = null;
+        // To store the corresponding instance of ReactClass later on.
+        this._instance = null;
+    }
+
+    // Mounting the component to generate the DOM element structure.
+    // Should return the current custom elements' render contents.
+    ReactCompositeComponent.prototype.mountComponent = function (rootID) {
+        this._rootNodeID = rootID;
+        // The current element's prop values.
+        var publicProps = this._currentElement.props;
+        // The current element's ReactClass (Component class).
+        var ReactClass = this._currentElement.type;
+        // Initialize the public class
+        var inst = new ReactClass(publicProps);
+        this._instance = inst;
+        // Maintain reference to the current component - for future updates.
+        inst._reactInternalInstance = this;
+
+        if (inst.componentWillMount) {
+            inst.componentWillMount();
+            // There is a lot more additional logic here in the complete library - but we'll keep it simple here.
+        }
+        // Call the ReactClass instance's render method - this returns an element or a text node
+        var renderedElement = this._instance.render();
+        // Get component class instance of the rendered element.
+        var renderedComponentInstance = instantiateReactComponent(renderedElement);
+        this._renderedComponent = renderedComponentInstance; // Save component instance for later use.
+
+        // Get string content after rendering, the current _rootNodeID passed to render the node.
+        var renderedMarkup = renderedComponentInstance.mountComponent(this._rootNodeID);
+
+        // Add an event listener for 'mountReady' event - which is triggered when React.render() completes.
+        $(document).on('mountReady', function () {
+            // call inst.componentDidMount
+            inst.componentDidMount && inst.componentDidMount();
+        });
+
+        return renderedMarkup;
+    };
+
+    function instantiateReactComponent(node) {
+        // If a text node
+        if (typeof node === 'string' || typeof node === 'number') {
+            return new ReactDOMTextComponent(node);
+        }
+        // If a browser tag/node
+        if (typeof node === 'object' && typeof node.type === 'string') {
+            return new ReactDOMComponent(node);
+        }
+        // If composite element node
+        if (typeof node === 'object' && typeof node.type === 'function') {
+            return new ReactCompositeComponent(node);
+        }
+    }
+
+    // React Element's instance is basically what we call the Virtual DOM.
+    // It has a type attribute representing the current node type, as well as props attribute for the node.
+    // Also here the `key` is used to uniquely identify this element regardless of where you are in the DOM tree + optimizations for future updates
+    function ReactElement(type, key, props) {
+        this.type = type;
+        this.key = key;
+        this.props = props;
+    }
+
+    // ReactClass - In a way this is the Super class
+    // For demo purposes, we're keep ReactClass simple - the original code handles a lot of things,
+    // eg. mixin class inheritance support, componentDidMount etc.
+    var ReactClass = function () {
+    };
+    // This leaves subclasses to inherit the render
+    ReactClass.prototype.render = function () {
+    };
+
+
+    React = {
+        nextReactRootIndex: 0,
+        createClass: function (spec) {
+            // Generate a subclass
+            var Constructor = function (props) {
+                this.props = props;
+                this.state = this.getInitialState ? this.getInitialState() : null;
+            };
+            // Prototype Inheritance
+            // This is a way to implement two levels of inheritance with constructor.
+            // If not clear check this: http://stackoverflow.com/a/7719184/1672655
+            Constructor.prototype = new ReactClass();        // (or) Object.create(ReactClass.prototype)
+            Constructor.prototype.constructor = Constructor; // Setting back the constructor to `Constructor`
+
+            // Combine spec with prototype
+            $.extend(Constructor.prototype, spec);
+            return Constructor;
+        },
+        createElement: function (type, config, children) {
+            var props = {}, propName;
+            config = config || {};
+            // Check if the key  is specified - if so it is easy to quickly identify and update the element in future.
+            var key = config.key || null;
+
+            // Copy config object over as props.
+            for (propName in config) {
+                if (config.hasOwnProperty(propName) && propName !== 'key') {
+                    props[propName] = config[propName];
+                }
+            }
+
+            // Handle children - which can be passed as additional params to createlement()
+            var childrenLength = arguments.length - 2;
+            if (childrenLength === 1) {
+                props.children = Array.isArray(children) ? children : [children];
+            } else if (childrenLength > 1) {
+                var childArray = [];
+                for (var i = 0; i < childrenLength; i++) {
+                    childArray[i] = arguments[i + 2];
+                }
+                props.children = childArray;
+            }
+
+            return new ReactElement(type, key, props);
+
+        },
+        render: function (element, container) {
+            var componentInstance = instantiateReactComponent(element);
+            var markup = componentInstance.mountComponent(React.nextReactRootIndex++);
+            $(container).html(markup);
+            // Trigger the mount complete event
+            $(document).trigger('mountReady');
+        }
+    };
+
+    var HelloMessage = React.createClass({
+        // getInitialState obtains the initial property values of ​​this.state
+        getInitialState: function () {
+            return {type: 'say:'};
+        },
+        // Invoked when component is ready to render.
+        componentWillMount: function () {
+            console.log('I am going to start rendering the component - componentWillMount')
+        },
+        // Invoked after component has completed rendering.
+        componentDidMount: function () {
+            console.log('I have rendered the component - componentDidMount')
+        },
+        render: function () {
+            return React.createElement("div", null, this.state.type, "Hello ", this.props.name);
+        }
+    });
+
+    // If createElement's ty[e is not a string and instead is a class == It's a React Composite Element.
+    React.render(React.createElement(HelloMessage, {name: "John"}), document.getElementById("container"));
+
+    /**
+     * Results:
+     *
+     * html:
+     * <div data-reactid = "0">
+     *     <span data-reactid = "0.0"> say: </span>
+     *     <span data-reactid = "0.1"> Hello </span>
+     *     <span data-reactid = "0.2"> John </span>
+     * </div>
+     *
+     * Console:
+     * I am going to start rendering the component - componentWillMount
+     * I have rendered the component - componentDidMount
+     */
+
+</script>
+</body>
+
+
+</html>
