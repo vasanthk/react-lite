@@ -1,3 +1,3 @@
 # React Prototype
 
-Bare bones working prototype of React :)
+Simple working prototype of React :)
