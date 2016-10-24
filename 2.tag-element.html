@@ -160,10 +160,10 @@
 
     // Just a simple fn that is triggered onclick
     function hello() {
-        alert('hello')
+        alert('Don\'t click me: Bad Hombre!')
     }
 
-    var element = React.createElement('div', {id: 'test', onclick: hello}, 'click me');
+    var element = React.createElement('div', {id: 'test', onclick: hello}, 'Click me not');
 
     React.render(element, document.getElementById("container"));
 

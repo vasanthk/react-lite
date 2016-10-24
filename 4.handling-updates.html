@@ -623,7 +623,7 @@
         },
         changeType: function () {
             // This is updated asynchronously, because we kep track of lastindex - so most of the nodes do not need to be removed
-            this.props.name = 'JOHN';
+            this.props.name = 'OBAMA';
             this.setState({
                 type: 'shout:'
             })
@@ -631,12 +631,12 @@
         render: function () {
             return React.createElement("div", {
                 onclick: this.changeType.bind(this)
-            }, this.state.type, "Hello ", this.props.name);
+            }, this.state.type, "Thanks ", this.props.name);
         }
     });
 
     React.render(React.createElement(HelloMessage, {
-        name: "John"
+        name: "Obama"
     }), document.getElementById("container"));
 
     /**

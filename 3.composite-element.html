@@ -250,12 +250,12 @@
             console.log('I have rendered the component - componentDidMount')
         },
         render: function () {
-            return React.createElement("div", null, this.state.type, "Hello ", this.props.name);
+            return React.createElement("div", null, this.state.type, "Thanks ", this.props.name);
         }
     });
 
     // If createElement's type is not a string and instead is a class == It's a React Composite Element.
-    React.render(React.createElement(HelloMessage, {name: "John"}), document.getElementById("container"));
+    React.render(React.createElement(HelloMessage, {name: "Obama"}), document.getElementById("container"));
 
     /**
      * Results:
