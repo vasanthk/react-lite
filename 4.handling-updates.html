@@ -318,10 +318,10 @@
                     type: UPDATE_TYPES.INSERT_MARKUP,
                     fromIndex: null,
                     toIndex: nextIndex,
-                    markup: nextChild.mountComponent() // Extra key in object to indicate the content of new DOM node.
+                    markup: nextChild.mountComponent(self._rootNodeID + '.' + name) // Extra key in object to indicate the content of new DOM node.
                 });
             }
-            // Update the mout index.
+            // Update the mount index.
             nextChild._mountIndex = nextIndex;
             nextIndex++;
         }
