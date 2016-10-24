@@ -161,7 +161,7 @@
                 continue;
             }
 
-            if (propKey === 'children') {
+            if (propKey == 'children') {
                 continue;
             }
 
@@ -268,8 +268,6 @@
         var lastIndex = 0;
         // The index of the next node to be visited
         var nextIndex = 0;
-        // Placeholder name variable used in loops.
-        var name;
 
         // Compare the differences between two sets and add nodes to the queue
         for (name in nextChildren) {
@@ -338,6 +336,9 @@
                     fromIndex: prevChildren[name]._mountIndex,
                     toIndex: null
                 });
+                if (prevChildren[name]._rootNodeID) {
+                    $(document).undelegate('.' + prevChildren[name]._rootNodeID);
+                }
                 // Side Note:
                 // If a DOM element is removed and is reference-free (no references pointing to it)
                 // then the element is picked up by the garbage collector
@@ -392,6 +393,9 @@
                     break;
                 case UPDATE_TYPES.MOVE_EXISTING:
                     insertChildAt(update.parentNode, initialChildren[update.parentID][update.fromIndex], update.toIndex);
+                    break;
+                case UPATE_TYPES.REMOVE_NODE:
+                    // This has already been handled in the previous for-loop.
                     break;
             }
         }
@@ -496,7 +500,7 @@
     // Used to compare two elements and determine if update is needed
     // Checks if element types are the same and if an object also checks for the `key` which uniquely identifiess the element.
     var _shouldUpdateReactComponent = function (prevElement, nextElement) {
-        if (prevElement && nextElement) {
+        if (prevElement != null && nextElement != null) {
             var prevType = typeof prevElement;
             var nextType = typeof nextElement;
             if (prevType === 'string' || prevType === 'number') {
@@ -572,7 +576,8 @@
             return Constructor;
         },
         createElement: function (type, config, children) {
-            var props = {}, propName;
+            var props = {};
+            var propName;
             config = config || {};
             // Check if the key  is specified - if so it is easy to quickly identify and update the element in future.
             var key = config.key || null;
@@ -597,7 +602,6 @@
             }
 
             return new ReactElement(type, key, props);
-
         },
         render: function (element, container) {
             var componentInstance = instantiateReactComponent(element);
