@@ -200,7 +200,7 @@ function flattenChildren(componentChildren) {
   var childrenMap = {};
   for (var i = 0; i < componentChildren.length; i++) {
     child = componentChildren[i];
-    name = child && child._currentelement && child._currentelement.key ? child._currentelement.key : i.toString(36);
+    name = child && child._currentElement && child._currentElement.key ? child._currentElement.key : i.toString(36);
     // Note: toString(36) - converts to base 36 (hexatrigesimal) to allow large ints
     childrenMap[name] = child;
   }
@@ -448,8 +448,9 @@ ReactCompositeComponent.prototype.receiveComponent = function (nextElement, newS
   var nextState = $.extend(inst.state, newState);
   var nextProps = this._currentElement.props;
 
-  // Update state in the instance
+  // Update state & props in instance
   inst.state = nextState;
+  inst.props = nextProps;
 
   // If there is shouldComponentUpdate inst and returns false. Do not update the component - just return.
   if (inst.shouldComponentUpdate && (inst.shouldComponentUpdate(nextProps, nextState) === false)) {
