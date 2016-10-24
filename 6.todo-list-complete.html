@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="./react-prototype.js"></script>
+    <style type="text/css">
+        .vert-offset-top-0 {
+            margin-top: 0em;
+        }
+
+        .vert-offset-top-2 {
+            margin-top: 2em;
+        }
+    </style>
+    <link rel='stylesheet prefetch' href='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css'>
+</head>
+
+<body>
+
+<section class="container vert-offset-top-2">
+    <div id="todoBox" class="todoBox col-xs-6 col-xs-offset-3"></div>
+</section>
+
+<script type="text/javascript">
+    var TodoBox = React.createClass({
+        displayName: "TodoBox",
+
+        getInitialState: function getInitialState() {
+            return {
+                data: [{"id": "00001", "task": "Wake up", "complete": "false"}, {
+                    "id": "00002",
+                    "task": "Eat breakfast",
+                    "complete": "false"
+                }, {"id": "00003", "task": "Go to work", "complete": "false"}]
+            };
+        },
+        generateId: function generateId() {
+            return Math.floor(Math.random() * 90000) + 10000;
+        },
+        handleNodeRemoval: function handleNodeRemoval(nodeId) {
+            var data = this.state.data;
+            data = data.filter(function (el) {
+                return el.id !== nodeId;
+            });
+            this.setState({data: data});
+        },
+        handleSubmit: function handleSubmit(task) {
+            var data = this.state.data;
+            var id = this.generateId().toString();
+            var complete = 'false';
+            data = data.concat([{id: id, task: task, complete: complete}]);
+            this.setState({data: data});
+        },
+        handleToggleComplete: function handleToggleComplete(nodeId) {
+            var data = this.state.data;
+            for (var i in data) {
+                if (data[i].id == nodeId) {
+                    data[i].complete = data[i].complete === 'true' ? 'false' : 'true';
+                    break;
+                }
+            }
+            this.setState({data: data});
+        },
+        render: function render() {
+            return React.createElement(
+                    "div",
+                    {class: "well"},
+                    React.createElement(
+                            "h1",
+                            {class: "vert-offset-top-0"},
+                            "To do:"
+                    ),
+                    React.createElement(TodoList, {
+                        data: this.state.data,
+                        removeNode: this.handleNodeRemoval.bind(this),
+                        toggleComplete: this.handleToggleComplete.bind(this)
+                    }),
+                    React.createElement(TodoForm, {onTaskSubmit: this.handleSubmit.bind(this)})
+            );
+        }
+    });
+
+    var TodoList = React.createClass({
+        displayName: "TodoList",
+
+        removeNode: function removeNode(nodeId) {
+            this.props.removeNode(nodeId);
+        },
+        toggleComplete: function toggleComplete(nodeId) {
+            this.props.toggleComplete(nodeId);
+        },
+        render: function render() {
+            var listNodes = this.props.data.map(function (listItem) {
+                return React.createElement(TodoItem, {
+                    key: listItem.id,
+                    nodeId: listItem.id,
+                    task: listItem.task,
+                    complete: listItem.complete,
+                    removeNode: this.removeNode.bind(this),
+                    toggleComplete: this.toggleComplete.bind(this)
+                });
+            }, this);
+            return React.createElement(
+                    "ul",
+                    {class: "list-group"},
+                    listNodes
+            );
+        }
+    });
+
+    var TodoItem = React.createClass({
+        removeNode: function removeNode(e) {
+            e.preventDefault();
+            this.props.removeNode(this.props.nodeId);
+        },
+        toggleComplete: function toggleComplete(e) {
+            e.preventDefault();
+            this.props.toggleComplete(this.props.nodeId);
+        },
+        updateClass: function updateClass() {
+        },
+        render: function render() {
+            var classes = 'list-group-item clearfix';
+            if (this.props.complete === 'true') {
+                classes = classes + ' list-group-item-success';
+            }
+            return React.createElement(
+                    "li",
+                    {class: classes},
+                    this.props.task,
+                    React.createElement(
+                            "div",
+                            {class: "pull-right", role: "group"},
+                            React.createElement(
+                                    "button",
+                                    {
+                                        type: "button",
+                                        class: "btn btn-xs btn-success img-circle",
+                                        onclick: this.toggleComplete.bind(this)
+                                    },
+                                    "\u2713"
+                            ),
+                            " ",
+                            React.createElement(
+                                    "button",
+                                    {
+                                        type: "button",
+                                        class: "btn btn-xs btn-danger img-circle",
+                                        onclick: this.removeNode.bind(this)
+                                    },
+                                    "\uFF38"
+                            )
+                    )
+            );
+        }
+    });
+
+    var TodoForm = React.createClass({
+        doSubmit: function doSubmit(e) {
+            e.preventDefault();
+            var task = document.getElementById('task').value.trim();
+            if (!task) {
+                return;
+            }
+            this.props.onTaskSubmit(task);
+            document.getElementById('task').value = '';
+        },
+        render: function render() {
+            return React.createElement(
+                    "div",
+                    {class: "commentForm vert-offset-top-2"},
+                    React.createElement("hr", null),
+                    React.createElement(
+                            "div",
+                            {class: "clearfix"},
+                            React.createElement(
+                                    "form",
+                                    {class: "todoForm form-horizontal", onsubmit: this.doSubmit.bind(this)},
+                                    React.createElement(
+                                            "div",
+                                            {class: "form-group"},
+                                            React.createElement(
+                                                    "label",
+                                                    {htmlFor: "task", class: "col-md-2 control-label"},
+                                                    "Task"
+                                            ),
+                                            React.createElement(
+                                                    "div",
+                                                    {class: "col-md-10"},
+                                                    React.createElement("input", {
+                                                        type: "text",
+                                                        id: "task",
+                                                        class: "form-control",
+                                                        placeholder: "What do you need to do?"
+                                                    })
+                                            )
+                                    ),
+                                    React.createElement(
+                                            "div",
+                                            {class: "row"},
+                                            React.createElement(
+                                                    "div",
+                                                    {class: "col-md-10 col-md-offset-2 text-right"},
+                                                    React.createElement("input", {
+                                                        type: "submit",
+                                                        value: "Save Item",
+                                                        class: "btn btn-primary"
+                                                    })
+                                            )
+                                    )
+                            )
+                    )
+            );
+        }
+    });
+
+    React.render(React.createElement(TodoBox, null), document.getElementById('todoBox'));
+</script>
+</body>
+
+
+</html>
