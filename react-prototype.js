@@ -51,7 +51,7 @@ ReactDOMComponent.prototype.mountComponent = function (rootID) {
   //
   // More: http://stackoverflow.com/a/33967810/1672655
   // React 15 uses document.createElement instead, so client rendered markup won't include these attributes anymore.
-  tagOpen += ' data-reactid=' + this._rootNodeID;
+  tagOpen += ' data-reactid="' + this._rootNodeID + '"';
 
   // Put together prop values into the tag
   for (var propKey in props) {
@@ -64,7 +64,7 @@ ReactDOMComponent.prototype.mountComponent = function (rootID) {
 
     // Ignore children and event listener props. -- Rest of the props are assigned as attributes to the DOM element.
     if (props[propKey] && propKey !== 'children' && !/^on[A-Za-z]/.test(propKey)) {
-      tagOpen += ' ' + propKey + '=' + props[propKey];
+      tagOpen += ' ' + propKey + '="' + props[propKey] + '"';
     }
   }
 
@@ -270,7 +270,7 @@ ReactDOMComponent.prototype._diff = function (diffQueue, nextChildrenElements) {
       // TYPE：MOVE_EXISTING
       prevChild._mountIndex < lastIndex && diffQueue.push({
         parentId: self._rootNodeID,
-        parentNode: $('[data-reactid=' + self._rootNodeID + ']'),
+        parentNode: $('[data-reactid="' + self._rootNodeID + '"]'),
         type: UPDATE_TYPES.MOVE_EXISTING,
         fromIndex: prevChild._mountIndex,
         toIndex: nextIndex
@@ -283,7 +283,7 @@ ReactDOMComponent.prototype._diff = function (diffQueue, nextChildrenElements) {
         // TYPE：REMOVE_NODE
         diffQueue.push({
           parentId: self._rootNodeID,
-          parentNode: $('[data-reactid=' + self._rootNodeID + ']'),
+          parentNode: $('[data-reactid="' + self._rootNodeID + '"]'),
           type: UPDATE_TYPES.REMOVE_NODE,
           fromIndex: prevChild._mountIndex,
           toIndex: null
@@ -300,7 +300,7 @@ ReactDOMComponent.prototype._diff = function (diffQueue, nextChildrenElements) {
       // TYPE：INSERT_MARKUP
       diffQueue.push({
         parentId: self._rootNodeID,
-        parentNode: $('[data-reactid=' + self._rootNodeID + ']'),
+        parentNode: $('[data-reactid="' + self._rootNodeID + '"]'),
         type: UPDATE_TYPES.INSERT_MARKUP,
         fromIndex: null,
         toIndex: nextIndex,
@@ -319,7 +319,7 @@ ReactDOMComponent.prototype._diff = function (diffQueue, nextChildrenElements) {
       // TYPE：REMOVE_NODE
       diffQueue.push({
         parentId: self._rootNodeID,
-        parentNode: $('[data-reactid=' + self._rootNodeID + ']'),
+        parentNode: $('[data-reactid="' + self._rootNodeID + '"]'),
         type: UPDATE_TYPES.REMOVE_NODE,
         fromIndex: prevChildren[name]._mountIndex,
         toIndex: null
@@ -481,7 +481,7 @@ ReactCompositeComponent.prototype.receiveComponent = function (nextElement, newS
     // Mount the corresponding component and get its DOM content.
     var nextMarkup = _renderedComponent.mountComponent(thisID);
     // Replace the entire node.
-    $('[data-reactid=' + this._rootNodeID + ']').replaceWith(nextMarkup);
+    $('[data-reactid="' + this._rootNodeID + '"]').replaceWith(nextMarkup);
   }
 };
 
