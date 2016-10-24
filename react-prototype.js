@@ -147,7 +147,7 @@ ReactDOMComponent.prototype._updateDOMProperties = function (lastProps, nextProp
       continue;
     }
 
-    if (propKey == 'children') {
+    if (propKey === 'children') {
       continue;
     }
 
@@ -254,6 +254,8 @@ ReactDOMComponent.prototype._diff = function (diffQueue, nextChildrenElements) {
   var lastIndex = 0;
   // The index of the next node to be visited
   var nextIndex = 0;
+  // Placeholder name variable used in loops.
+  var name;
 
   // Compare the differences between two sets and add nodes to the queue
   for (name in nextChildren) {
@@ -486,7 +488,7 @@ ReactCompositeComponent.prototype.receiveComponent = function (nextElement, newS
 // Used to compare two elements and determine if update is needed
 // Checks if element types are the same and if an object also checks for the `key` which uniquely identifiess the element.
 var _shouldUpdateReactComponent = function (prevElement, nextElement) {
-  if (prevElement != null && nextElement != null) {
+  if (prevElement && nextElement) {
     var prevType = typeof prevElement;
     var nextType = typeof nextElement;
     if (prevType === 'string' || prevType === 'number') {
