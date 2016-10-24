@@ -291,7 +291,7 @@ ReactDOMComponent.prototype._diff = function (diffQueue, nextChildrenElements) {
 
         // If you have previously rendered it - remember to remove all previous namespaced event listeners.
         if (prevChild._rootNodeID) {
-          $(document).undelegate('.' + prevChild._rootNodeID);
+          $(document).undelegate('[data-reactid="' + prevChild._rootNodeID + '"]');
         }
         lastIndex = Math.max(prevChild._mountIndex, lastIndex);
       }
@@ -325,7 +325,7 @@ ReactDOMComponent.prototype._diff = function (diffQueue, nextChildrenElements) {
         toIndex: null
       });
       if (prevChildren[name]._rootNodeID) {
-        $(document).undelegate('.' + prevChildren[name]._rootNodeID);
+        $(document).undelegate('[data-reactid="' + prevChildren._rootNodeID + '"]');
       }
       // Side Note:
       // If a DOM element is removed and is reference-free (no references pointing to it)
@@ -354,12 +354,12 @@ ReactDOMComponent.prototype._patch = function (updates) {
     if (update.type === UPDATE_TYPES.MOVE_EXISTING || update.type === UPDATE_TYPES.REMOVE_NODE) {
       var updatedIndex = update.fromIndex;
       var updatedChild = $(update.parentNode.children().get(updatedIndex));
-      var parentID = update.parentID;
+      var parentId = update.parentId;
 
       // Need to update all nodes - Saved for later use.
-      initialChildren[parentID] = initialChildren[parentID] || [];
+      initialChildren[parentId] = initialChildren[parentId] || [];
       // Use parentID as a simple namespace
-      initialChildren[parentID][updatedIndex] = updatedChild;
+      initialChildren[parentId][updatedIndex] = updatedChild;
 
       // For the node to be moved:
       // 1. First need to delete the node.
