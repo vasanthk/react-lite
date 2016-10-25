@@ -487,7 +487,7 @@ ReactCompositeComponent.prototype.receiveComponent = function (nextElement, newS
 };
 
 // Used to compare two elements and determine if update is needed
-// Checks if element types are the same and if an object also checks for the `key` which uniquely identifiess the element.
+// Checks if element types are the same and if an object also checks for the `key` which uniquely identifies the element.
 var _shouldUpdateReactComponent = function (prevElement, nextElement) {
   if (prevElement && nextElement) {
     var prevType = typeof prevElement;
@@ -525,7 +525,7 @@ function ReactElement(type, key, props) {
   this.props = props;
 }
 
-// ReactClass - In a way this is the Super class
+// ReactClass - In a way this is the super class
 // For demo purposes, we're keep ReactClass simple - the original code handles a lot of things,
 // eg. mixin class inheritance support, componentDidMount etc.
 var ReactClass = function () {
@@ -568,7 +568,7 @@ React = {
     var props = {};
     var propName;
     config = config || {};
-    // Check if the key  is specified - if so it is easy to quickly identify and update the element in future.
+    // Check if the key is specified - if so it is easy to quickly identify and update the element in future.
     var key = config.key || null;
 
     // Copy config object over as props.
@@ -578,7 +578,7 @@ React = {
       }
     }
 
-    // Handle children - which can be passed as additional params to createlement()
+    // Handle children - which can be passed as additional params to createElement()
     var childrenLength = arguments.length - 2;
     if (childrenLength === 1) {
       props.children = Array.isArray(children) ? children : [children];
