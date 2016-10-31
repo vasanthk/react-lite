@@ -2,6 +2,8 @@
 
 Simple working prototype of React :)
 
+Size: 2kb gzipped.
+
 ###Readings
 
 [React - Basic Theoretical Concepts](https://github.com/reactjs/react-basic)
