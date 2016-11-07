@@ -14,6 +14,8 @@ Size: 2kb gzipped.
 
 [React Source parsing](http://zhenhua-lee.github.io/react/react.html)
 
+[React in 200 bytes](https://medium.com/@gab_montes/react-in-200-bytes-28156e714165#.a82m7wii6)
+
 [React source code analysis series - 1. Life cycle management](https://zhuanlan.zhihu.com/p/20312691)
 
 [React source code analysis series - 2. Decrypting setState](https://zhuanlan.zhihu.com/p/20328570)
