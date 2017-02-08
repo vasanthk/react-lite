@@ -1,6 +1,6 @@
-# React Prototype
+# React Lite
 
-Simple working prototype of React :)
+A simple light-weight working prototype of React :)
 
 Size: 2kb gzipped.
 
