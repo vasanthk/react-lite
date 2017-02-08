@@ -5,7 +5,7 @@ Mainly for learning purposes and getting the essence of React.js.
 
 Size: 2kb gzipped.
 
-###Readings
+### Reference
 
 [React - Basic Theoretical Concepts](https://github.com/reactjs/react-basic)
 
