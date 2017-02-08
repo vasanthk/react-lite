@@ -1,6 +1,7 @@
 # React Lite
 
-A simple light-weight working prototype of React :)
+A simple light-weight prototype of React :)
+Mainly for learning purposes and getting the essence of React.js.
 
 Size: 2kb gzipped.
 
