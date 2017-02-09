@@ -22,7 +22,7 @@ ReactDOMTextComponent.prototype.receiveComponent = function (nextText) {
   if (nextStringText !== this._currentElement) {
     this._currentElement = nextStringText;
     // Replace entire node
-    $('[data-reactid="' + this._rootNodeID + '"]').html(this._currentElement);
+    document.querySelector('[data-reactid="' + this._rootNodeID + '"]').innerHTML = this._currentElement;
   }
 };
 
@@ -59,7 +59,7 @@ ReactDOMComponent.prototype.mountComponent = function (rootID) {
     if (/^on[A-Za-z]/.test(propKey)) {
       var eventType = propKey.replace('on', '');
       // Add the event listener as a custom event on the current DOM node - identfied via the rootNodeId values.
-      $(document).delegate('[data-reactid="' + this._rootNodeID + '"]', eventType + '.' + this._rootNodeID, props[propKey]);
+      $(document).on(eventType + '.' + this._rootNodeID, '[data-reactid="' + this._rootNodeID + '"]', props[propKey]);
     }
 
     // Ignore children and event listener props. -- Rest of the props are assigned as attributes to the DOM element.
@@ -127,7 +127,7 @@ ReactDOMComponent.prototype._updateDOMProperties = function (lastProps, nextProp
     if (/^on[A-Za-z]/.test(propKey)) {
       var eventType = propKey.replace('on', '');
       // Remove event listener for the current node.
-      $(document).undelegate('[data-reactid="' + this._rootNodeID + '"]', eventType, lastProps[propKey]);
+      $(document).off(eventType, '[data-reactid="' + this._rootNodeID + '"]', lastProps[propKey]);
       continue;
     }
 
@@ -143,7 +143,7 @@ ReactDOMComponent.prototype._updateDOMProperties = function (lastProps, nextProp
       // Remove previously attached eventType specific event listeners for the node (generic event)
       lastProps[propKey] && $(document).undelegate('[data-reactid="' + this._rootNodeID + '"]', eventType, lastProps[propKey]);
       // Add an event listener for the current node with the _rootNodeID namespace (custom Event)
-      $(document).delegate('[data-reactid="' + this._rootNodeID + '"]', eventType + '.' + this._rootNodeID, nextProps[propKey]);
+      $(document).on(eventType + '.' + this._rootNodeID, '[data-reactid="' + this._rootNodeID + '"]', nextProps[propKey]);
       continue;
     }
 
@@ -291,7 +291,7 @@ ReactDOMComponent.prototype._diff = function (diffQueue, nextChildrenElements) {
 
         // If you have previously rendered it - remember to remove all previous namespaced event listeners.
         if (prevChild._rootNodeID) {
-          $(document).undelegate('[data-reactid="' + prevChild._rootNodeID + '"]');
+          $(document).off('[data-reactid="' + prevChild._rootNodeID + '"]');
         }
         lastIndex = Math.max(prevChild._mountIndex, lastIndex);
       }
@@ -325,7 +325,7 @@ ReactDOMComponent.prototype._diff = function (diffQueue, nextChildrenElements) {
         toIndex: null
       });
       if (prevChildren[name]._rootNodeID) {
-        $(document).undelegate('[data-reactid="' + prevChildren._rootNodeID + '"]');
+        $(document).off('[data-reactid="' + prevChildren._rootNodeID + '"]');
       }
       // Side Note:
       // If a DOM element is removed and is reference-free (no references pointing to it)
