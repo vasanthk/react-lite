@@ -62,7 +62,7 @@ Size: 2kb gzipped.
 
 [React Lite - an implementation of React that optimizes for small script size](https://github.com/Lucifier129/react-lite)
 
-###Videos
+### Videos
 
 [Building React from Scratch - Paul O Shannessy](https://www.youtube.com/watch?v=_MAD4Oly9yg)
 
@@ -77,3 +77,5 @@ Size: 2kb gzipped.
 [React reconciliation - Jim Sproch](https://www.youtube.com/watch?v=EZV2rwnGgZA)
 
 [React Fiber: What's next for React](https://www.youtube.com/watch?v=aV1271hd9ew)
+
+[A Cartoon Intro to Fiber - Lin Clark](https://www.youtube.com/watch?v=ZCuYPiUIONs)
